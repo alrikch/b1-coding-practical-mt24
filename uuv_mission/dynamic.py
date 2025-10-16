@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import numpy as np
 import matplotlib.pyplot as plt
 from .terrain import generate_reference_and_limits
+from .control import Control
 
 class Submarine:
     def __init__(self):
@@ -88,7 +89,7 @@ class Mission:
         return cls(reference, cave_height, cave_depth)
 
 class ClosedLoop:
-    def __init__(self, plant: Submarine, controller):
+    def __init__(self, plant: Submarine, controller: Control):
         self.plant = plant
         self.controller = controller
 
@@ -114,18 +115,3 @@ class ClosedLoop:
         disturbances = np.random.normal(0, variance, len(mission.reference))
         return self.simulate(mission, disturbances)
 
-class Control:
-    def __init__(self):
-        self.kp = 0.15
-        self.kd = 0.6
-        self.previous_error = 0.0
-
-    def compute_action(self, reference: float, observation: float) -> float:
-        error = reference - observation
-        derivative_error = (error - self.previous_error)
-
-        action = (self.kp * error +
-                  self.kd * derivative_error)
-
-        self.previous_error = error
-        return action
